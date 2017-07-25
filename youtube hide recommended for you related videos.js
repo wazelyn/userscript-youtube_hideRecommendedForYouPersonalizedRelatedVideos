@@ -9,50 +9,75 @@
 // @require     https://code.jquery.com/jquery-3.2.1.js
 // ==/UserScript==
 
-//console.log("hi");
+hideAllUnrelatedVideos_PreRedesign_20170725();
+//hideAllUnrelatedVideos_20170725_redesign();
 
-//2017-01-27-1849-04 added share page block
-
-//document.body.innerHTML ="<br><br>"+"<p>hello 123124134132525</p>"+"<br><br>"+document.body.innerHTML;
-//console.log("hi");
-//1. get all related videos
-//<li class="video-list-item related-list-item show-video-time">
-//2016-04-26 li name updated again
-//2017-03-23-1627-54 hide "Live now" streams. That's not related.
-
-setTimeout(function(){
-    //console.log("hihihi");
-    hideAllDivs();
-    setInterval (function(){
-        hideAllDivs();
-    }, 1000);
-  }, 3000); //2017-07-24-1701-44 new player needs some time to load the channel name
-
-function hideAllDivs()
+function hideAllUnrelatedVideos_20170725_redesign()
 {
-    //hideRecommendedDivs_withLiName("video-list-item related-list-item related-list-item-compact-video");
-    //hideRecommendedDivs_withLiName("video-list-item related-list-item  show-video-time related-list-item-compact-video"); //2017-01-27
-    //hideRecommendedDivs_withLiName("related-item-dismissable", "stat view-count"); //2017-01-27 class change
-    //hideRecommendedDivs_withLiName("related-item-dismissable", "stat.view-count"); //2017-01-27 class change
-
-    //hideRecommendedDivs_withLiName("video-list-item related-list-item show-video-time");
-    //hideRecommendedDivs_withLiName("video-list-item related-list-item");
-
-    //hideRecommendedDivs_withLiName("yt-lockup-meta-info");
-    //hideRecommendedDivs_withLiName("yt-lockup-dismissable","yt-lockup-meta-info");
-
-    //3. hide the more related videos button since that will reload more suggestions, which may include recommended for you videos.
-    //[][][]document.getElementById("watch-more-related-button").style.display = "none";
-    
-    //4. 2017-06-22-2037-15 Screw the RETARDED VIDEOS. Just show videos from the same channel.
-    //filterBlockableSideBarVideos_thatDontMatchChannelName(".related-item-dismissable");
-    //filterBlockableSideBarVideos_thatDontMatchChannelName(".related-playlist");
-    filterBlockableSideBarVideos_thatDontMatchChannelName("div#dismissable");
-    
-    //2017-07-24-1645-51 another update
-    //youtube.com##.style-scope.ytd-watch-next-secondary-results-renderer
+    var isredesign = true;
+    setTimeout(function(){
+        hideAllDivs(isredesign);
+        setInterval (function(){
+            hideAllDivs(isredesign);
+        }, 1000);
+    }, 3000); //2017-07-24-1701-44 new player needs some time to load the channel name
+    return;
+}
+function hideAllUnrelatedVideos_PreRedesign_20170725()
+{
+    var isredesign = false;
+    setTimeout(function(){
+        hideAllDivs(isredesign);
+        setInterval (function(){
+            hideAllDivs(isredesign);
+        }, 1000);
+    }, 0);
+    return;
 }
 
+function hideAllDivs(isredesign)
+{
+    var mychannelname = getThisVideoChannelName(isredesign);
+    if (isredesign)
+        filterBlockableSideBarVideos_thatDontMatchChannelName("div#dismissable", mychannelname, isredesign);
+    else
+    {
+        filterBlockableSideBarVideos_thatDontMatchChannelName(".related-item-dismissable", mychannelname, isredesign);
+    }
+    return;
+}
+function getThisVideoChannelName(isredesign)
+{
+    var mychannelname;
+    if (isredesign)
+        mychannelname = $('#owner-container')[0].firstChild.innerText;
+    else
+        mychannelname = $('#watch7-user-header a.spf-link').not('a.yt-user-photo')[0].innerText; // for watch page
+    return mychannelname;
+}
+
+function filterBlockableSideBarVideos_thatDontMatchChannelName(myclassname, mychannelname, isredesign)
+{
+    var thisname;
+    var alltextblocks;
+    if (!isredesign)
+    {
+        alltextblocks = $(myclassname).find('.stat.attribution');
+    }
+    else
+    {
+        alltextblocks = $(myclassname).find('#byline-container').find('#byline');
+        $(myclassname).find('#metadata-line').hide(); //sure, let's hide the view count, too.
+    }
+    //
+    for (var i=0;i<alltextblocks.length;i++)
+    {
+        thisname = alltextblocks[i].innerText;
+        if (thisname !== mychannelname)
+            alltextblocks.closest(myclassname)[i].style.display = "none";
+    }
+    return;
+}
 function hideRecommendedDivs_withLiName(myclassname,myviewcountliname)
 {
 	allitems = document.getElementsByClassName(myclassname);
@@ -77,32 +102,3 @@ function hideRecommendedDivs_withLiName(myclassname,myviewcountliname)
 		}
 	}
 }
-
-function getThisVideoChannelName()
-{
-	//var mychannelname = $('#watch7-user-header a.spf-link').not('a.yt-user-photo')[0].innerText; // for watch page
-    var mychannelname = $('#owner-container')[0].firstChild.innerText;
-    //console.log(mychannelname);
-    return mychannelname;
-}
-//getThisVideoChannelName();
-function filterBlockableSideBarVideos_thatDontMatchChannelName(myclassname)
-{
-    var mychannelname = getThisVideoChannelName();
-    //console.log(mychannelname);
-    var thisname;
-    //var alltextblocks = $(myclassname).find('.stat.attribution');
-    var alltextblocks = $(myclassname).find('#byline-container').find('#byline');
-    $(myclassname).find('#metadata-line').hide(); //sure, let's hide the view count, too.
-    //myclassname
-    for (var i=0;i<alltextblocks.length;i++)
-    {
-        thisname = alltextblocks[i].innerText;
-        if (thisname !== mychannelname)
-            alltextblocks.closest(myclassname)[i].style.display = "none";
-    }
-    return;
-}
-
-//2017-05-02-0608-38 now the sidebar includes personalized videos that aren't described as such.
-//$('#watch7-sidebar-contents').hide();
