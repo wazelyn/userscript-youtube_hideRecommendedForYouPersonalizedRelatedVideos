@@ -43,6 +43,7 @@ function hideAllDivs(isredesign)
     else
     {
         filterBlockableSideBarVideos_thatDontMatchChannelName(".related-item-dismissable", mychannelname, isredesign);
+        filterBlockableSideBarVideos_thatDontMatchChannelName(".related-playlist", mychannelname, isredesign);
     }
     return;
 }
