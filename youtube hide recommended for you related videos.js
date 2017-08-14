@@ -44,6 +44,7 @@ function hideAllDivs(isredesign)
     {
         filterBlockableSideBarVideos_thatDontMatchChannelName(".related-item-dismissable", mychannelname, isredesign);
         filterBlockableSideBarVideos_thatDontMatchChannelName(".related-playlist", mychannelname, isredesign);
+        hidelivestreams();
     }
     return;
 }
@@ -55,6 +56,13 @@ function getThisVideoChannelName(isredesign)
     else
         mychannelname = $('#watch7-user-header a.spf-link').not('a.yt-user-photo')[0].innerText; // for watch page
     return mychannelname;
+}
+function hidelivestreams()
+{
+    var livestreams = $('.yt-badge.yt-badge-live');
+    for (var i=0;i<livestreams.length;i++)
+        livestreams[i].closest(".related-item-dismissable").style.display = "none";
+    return;
 }
 
 function filterBlockableSideBarVideos_thatDontMatchChannelName(myclassname, mychannelname, isredesign)
